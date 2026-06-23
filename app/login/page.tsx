@@ -74,14 +74,6 @@ export default function LoginPage() {
               required
               placeholder="••••••••"
               icon={<FiLock className="h-4.5 w-4.5" />}
-              rightLabelAction={
-                <Link
-                  href="/forgot-password"
-                  className="text-xs font-semibold text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white hover:underline transition-all"
-                >
-                  Forgot Password?
-                </Link>
-              }
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />

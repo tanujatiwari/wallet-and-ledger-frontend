@@ -2,14 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FaUtensils } from "react-icons/fa";
-import {
-  FiArrowDown,
-  FiCreditCard,
-  FiPlus,
-  FiShoppingBag,
-  FiRefreshCw
-} from "react-icons/fi";
+import { FiArrowDownLeft, FiArrowUpRight, FiCreditCard, FiPlus, FiRefreshCw } from "react-icons/fi";
 import {
   Bar,
   BarChart,
@@ -35,52 +28,51 @@ interface Transaction {
   status: "Completed" | "Processing" | "Pending";
   description?: string;
   icon: string | React.ComponentType<any>;
-  iconColorClass?: string;
+  iconColor?: string;
 }
 
 const defaultTransactions: Transaction[] = [
   {
     id: "1",
     dateTime: "Oct 24, 2023 03:45 PM",
-    type: "Debit (Apple Store)",
+    type: "Sent",
     walletId: "Apple Store Wallet",
     amount: "-₹107,000.00",
     isNegative: true,
     status: "Completed",
     description: "Purchase of MacBook Pro",
-    icon: "FiShoppingBag",
-    iconColorClass: "text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400"
+    icon: "FiArrowUpRight",
+    iconColor: "text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400"
   },
   {
     id: "2",
     dateTime: "Oct 23, 2023 01:15 PM",
-    type: "Debit (Sushi)",
+    type: "Sent",
     walletId: "Blue Ribbon Sushi",
     amount: "-₹6,900.00",
     isNegative: true,
     status: "Completed",
     description: "Team Lunch",
-    icon: "FaUtensils",
-    iconColorClass: "text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400"
+    icon: "FiArrowUpRight",
+    iconColor: "text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400"
   },
   {
     id: "3",
     dateTime: "Oct 22, 2023 11:00 AM",
-    type: "Credit (ACH)",
+    type: "Received",
     walletId: "ACH Transfer ACH-981",
     amount: "+₹410,000.00",
     isNegative: false,
     status: "Processing",
     description: "External Bank Transfer",
-    icon: "FiArrowDown",
-    iconColorClass: "text-blue-600 bg-blue-50 dark:bg-blue-950/30 dark:text-blue-400"
+    icon: "FiArrowDownLeft",
+    iconColor: "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-400"
   },
 ];
 
 const iconMap: Record<string, React.ComponentType<any>> = {
-  FiShoppingBag: FiShoppingBag,
-  FaUtensils: FaUtensils,
-  FiArrowDown: FiArrowDown,
+  FiArrowUpRight: FiArrowUpRight,
+  FiArrowDownLeft: FiArrowDownLeft,
   FiPlus: FiPlus
 };
 
@@ -106,11 +98,11 @@ const columns: Column<Transaction>[] = [
     props: {
       icon: (row) => {
         if (typeof row.icon === "string") {
-          return iconMap[row.icon] || FiArrowDown;
+          return iconMap[row.icon] || FiArrowUpRight;
         }
         return row.icon;
       },
-      iconColor: (row) => row.iconColorClass || "bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-gray-300",
+      iconColor: (row) => row.iconColor || "bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-gray-300",
     },
   },
   {
@@ -227,8 +219,8 @@ export default function DashboardPage() {
                 Add Money
               </button>
             </div>
-            <div className="bg-gray-50 border border-gray-105 dark:bg-slate-850 dark:border-slate-700 p-3 rounded-xl shadow-sm">
-              <FiCreditCard className="h-6 w-6 text-gray-700 dark:text-gray-300" />
+            <div className="bg-[#4df0b0]/20 border border-[#4df0b0]/30 p-3 rounded-xl shadow-sm text-emerald-700 dark:text-[#4df0b0]">
+              <FiCreditCard className="h-6 w-6" />
             </div>
           </div>
         </Card>
