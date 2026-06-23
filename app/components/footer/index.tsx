@@ -1,16 +1,6 @@
 import React from "react";
 import Link from "next/link";
-
-const links = [
-  {
-    href: "/privacy",
-    label: "Privacy Policy"
-  },
-  {
-    href: "/terms",
-    label: "Terms of Service"
-  },
-]
+import { footerLinks } from "../../utils/constants";
 
 const Footer: React.FC = () => {
   return (
@@ -23,7 +13,7 @@ const Footer: React.FC = () => {
 
         <div className="flex items-center justify-center space-x-6 font-medium">
           {
-            links.map((link) => (
+            footerLinks.map((link) => (
               <Link key={link.href} href={link.href} className="hover:text-gray-800 dark:hover:text-white transition-colors">
                 {link.label}
               </Link>

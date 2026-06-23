@@ -4,26 +4,7 @@ import { Card } from "../components/Card";
 import { Button } from "../components/Button";
 import { FiArrowLeft, FiHelpCircle, FiCheck, FiInfo } from "react-icons/fi";
 
-const rules = [
-  "Length: Between 4 and 20 characters",
-  "Characters: A-Z, 0-9, and underscores (_)",
-  "No spaces or special symbols (except underscore)"
-]
-
-const faqs = [
-  {
-    question: "What is a Unique Wallet Identifier?",
-    answer: "Your Wallet Identifier serves as your public username (e.g. \`@company_finance\`) on the Ledger Pro network. It allows clients, institutions, or other nodes to quickly send or route funds to you without exposing long cryptographic public key addresses."
-  },
-  {
-    question: "Handle formatting requirements",
-    answer: rules,
-  },
-  {
-    question: "Is this public information?",
-    answer: "Yes, other users on the network can lookup this username handle in order to initiate asset transfers. No private keys, passwords, or transaction details are publicly associated with the handle itself."
-  },
-]
+import { faqs } from "../utils/constants";
 
 export default function SetupHelpPage() {
   const router = useRouter();
