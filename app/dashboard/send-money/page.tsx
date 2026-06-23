@@ -1,19 +1,30 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
-import { FiCalendar, FiCreditCard } from "react-icons/fi";
+import { FiCalendar, FiCreditCard, FiRefreshCw } from "react-icons/fi";
 import { Button } from "../../components/Button";
 import { Card } from "../../components/Card";
 import { Input } from "../../components/Input";
 
 export default function SendMoneyPage() {
+  const router = useRouter();
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState("");
   const [scheduleLater, setScheduleLater] = useState(false);
+  const [scheduleDate, setScheduleDate] = useState("");
+  const [balance, setBalance] = useState<number>(124592.00);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 800);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert(`Transfer of $${amount} to ${recipient} initiated!`);
   };
 
   return (
@@ -33,11 +44,22 @@ export default function SendMoneyPage() {
             <FiCreditCard className="h-5 w-5" />
           </div>
           <div>
-            <p className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 tracking-wider">
-              Total Balance
-            </p>
+            <div className="flex items-center space-x-1.5">
+              <p className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 tracking-wider">
+                Total Balance
+              </p>
+              <button
+                type="button"
+                onClick={handleRefresh}
+                className={`p-0.5 text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all cursor-pointer rounded hover:bg-gray-100 dark:hover:bg-slate-800 ${isRefreshing ? "animate-spin" : ""
+                  }`}
+                title="Refresh Balance"
+              >
+                <FiRefreshCw className="h-2.5 w-2.5" />
+              </button>
+            </div>
             <p className="text-lg font-black text-gray-900 dark:text-white leading-tight">
-              $124,592.00
+              ${balance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
         </div>
@@ -76,12 +98,12 @@ export default function SendMoneyPage() {
                   required
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="w-full pl-10 pr-24 py-4 text-xl font-bold bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-mint/50 focus:border-accent-mint dark:text-white transition-all"
+                  className="w-full pl-10 pr-24 py-4 text-xl font-bold bg-white dark:bg-slate-900 border border-gray-205 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-mint/50 focus:border-accent-mint dark:text-white transition-all shadow-sm"
                 />
                 <button
                   type="button"
                   className="absolute right-4 text-xs font-bold text-[#10b981] hover:text-[#0ca678] dark:text-[#4df0b0] hover:underline cursor-pointer"
-                  onClick={() => setAmount("124592.00")}
+                  onClick={() => setAmount(balance.toFixed(2))}
                 >
                   Send Max
                 </button>
@@ -108,6 +130,24 @@ export default function SendMoneyPage() {
                   </div>
                 </div>
               </div>
+
+              {scheduleLater && (
+                <div className="mt-4 p-4 rounded-xl border border-gray-150 dark:border-slate-850 bg-white dark:bg-slate-950 space-y-2.5 animate-fadeIn">
+                  <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider block">
+                    Select Date & Time
+                  </label>
+                  <div className="relative flex items-center">
+                    <FiCalendar className="absolute left-3.5 text-gray-400 dark:text-gray-500 pointer-events-none" />
+                    <input
+                      type="datetime-local"
+                      required
+                      value={scheduleDate}
+                      onChange={(e) => setScheduleDate(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-mint/50 focus:border-accent-mint dark:bg-slate-900 dark:border-slate-800 dark:text-white transition-all shadow-sm"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             <Button
@@ -115,7 +155,7 @@ export default function SendMoneyPage() {
               variant="primary"
               className="w-full py-4 bg-black hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-100 rounded-xl font-bold shadow-md transition-all text-sm uppercase tracking-wider"
             >
-              Send Money
+              {scheduleLater ? "Schedule Transaction" : "Send Money"}
             </Button>
           </form>
         </Card>

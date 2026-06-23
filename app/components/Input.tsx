@@ -8,7 +8,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input: React.FC<InputProps> = ({ label, icon, rightLabelAction, className = "", ...rest }) => {
-  const inputClass = `w-full rounded-lg border border-gray-300 bg-white dark:bg-slate-800 dark:border-slate-700 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-mint/50 focus:border-accent-mint transition-all ${icon ? "pl-10" : ""} ${className}`;
+  const inputClass = `w-full rounded-xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-mint/50 focus:border-accent-mint dark:text-white transition-all shadow-sm ${icon ? "pl-10" : ""} ${className}`;
 
   return (
     <div className="flex flex-col space-y-1.5 w-full">

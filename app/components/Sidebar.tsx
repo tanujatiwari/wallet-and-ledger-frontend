@@ -8,13 +8,15 @@ import {
   FiGrid,
   FiList,
   FiLogOut,
-  FiSend
+  FiSend,
+  FiCalendar
 } from "react-icons/fi";
 import { RiBankLine } from "react-icons/ri";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: FiGrid },
   { href: "/dashboard/send-money", label: "Send Money", icon: FiSend },
+  { href: "/dashboard/scheduled", label: "Scheduled", icon: FiCalendar },
   { href: "/dashboard/transactions", label: "Transactions", icon: FiList },
 ];
 

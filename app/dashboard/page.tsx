@@ -7,7 +7,8 @@ import {
   FiArrowDown,
   FiCreditCard,
   FiPlus,
-  FiShoppingBag
+  FiShoppingBag,
+  FiRefreshCw
 } from "react-icons/fi";
 import {
   Bar,
@@ -33,11 +34,11 @@ interface Transaction {
   isNegative: boolean;
   status: "Completed" | "Processing" | "Pending";
   description?: string;
-  icon: React.ComponentType<any>;
+  icon: string | React.ComponentType<any>;
   iconColorClass?: string;
 }
 
-const transactions: Transaction[] = [
+const defaultTransactions: Transaction[] = [
   {
     id: "1",
     dateTime: "Oct 24, 2023 03:45 PM",
@@ -47,7 +48,7 @@ const transactions: Transaction[] = [
     isNegative: true,
     status: "Completed",
     description: "Purchase of MacBook Pro",
-    icon: FiShoppingBag,
+    icon: "FiShoppingBag",
     iconColorClass: "text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400"
   },
   {
@@ -59,7 +60,7 @@ const transactions: Transaction[] = [
     isNegative: true,
     status: "Completed",
     description: "Team Lunch",
-    icon: FaUtensils,
+    icon: "FaUtensils",
     iconColorClass: "text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400"
   },
   {
@@ -71,10 +72,17 @@ const transactions: Transaction[] = [
     isNegative: false,
     status: "Processing",
     description: "External Bank Transfer",
-    icon: FiArrowDown,
+    icon: "FiArrowDown",
     iconColorClass: "text-blue-600 bg-blue-50 dark:bg-blue-950/30 dark:text-blue-400"
   },
 ];
+
+const iconMap: Record<string, React.ComponentType<any>> = {
+  FiShoppingBag: FiShoppingBag,
+  FaUtensils: FaUtensils,
+  FiArrowDown: FiArrowDown,
+  FiPlus: FiPlus
+};
 
 const chartData = [
   { month: "May", credit: 45000, debit: 30000 },
@@ -96,7 +104,12 @@ const columns: Column<Transaction>[] = [
     type: "card",
     accessor: (row) => row.type,
     props: {
-      icon: (row) => row.icon,
+      icon: (row) => {
+        if (typeof row.icon === "string") {
+          return iconMap[row.icon] || FiArrowDown;
+        }
+        return row.icon;
+      },
       iconColor: (row) => row.iconColorClass || "bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-gray-300",
     },
   },
@@ -124,7 +137,7 @@ const columns: Column<Transaction>[] = [
       colorMap: {
         Completed: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400",
         Processing: "bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400",
-        Pending: "bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-gray-400",
+        Pending: "bg-gray-100 text-gray-650 dark:bg-slate-805 dark:text-gray-400",
       },
     },
   },
@@ -139,44 +152,46 @@ const columns: Column<Transaction>[] = [
 export default function DashboardPage() {
   const router = useRouter();
   const [balance, setBalance] = useState(202979);
-  const [transactionsList, setTransactionsList] = useState<Transaction[]>(transactions);
+  const [transactionsList, setTransactionsList] = useState<Transaction[]>([]);
   const [isAddMoneyOpen, setIsAddMoneyOpen] = useState(false);
   const [addAmount, setAddAmount] = useState("");
   const [mounted, setMounted] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+
+    const savedBalance = localStorage.getItem("ledger_inr_balance");
+    if (savedBalance) {
+      setBalance(parseFloat(savedBalance));
+    } else {
+      localStorage.setItem("ledger_inr_balance", "202979");
+    }
+
+    const savedTx = localStorage.getItem("ledger_inr_transactions");
+    if (savedTx) {
+      try {
+        setTransactionsList(JSON.parse(savedTx));
+      } catch (e) {
+        console.error("Failed to parse INR transactions, resetting", e);
+        setTransactionsList(defaultTransactions);
+        localStorage.setItem("ledger_inr_transactions", JSON.stringify(defaultTransactions));
+      }
+    } else {
+      setTransactionsList(defaultTransactions);
+      localStorage.setItem("ledger_inr_transactions", JSON.stringify(defaultTransactions));
+    }
   }, []);
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 800);
+  };
 
   const handleAddMoneySubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const amountVal = parseFloat(addAmount);
-    if (isNaN(amountVal) || amountVal <= 0) return;
-
-    setBalance((prev) => prev + amountVal);
-    const newTx: Transaction = {
-      id: String(transactionsList.length + 1),
-      dateTime: new Date().toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      }) + " " + new Date().toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      type: "Credit (Wallet Load)",
-      walletId: "UPI QR Code",
-      amount: `+₹${amountVal.toLocaleString("en-IN")}.00`,
-      isNegative: false,
-      status: "Completed",
-      description: "Wallet balance deposit",
-      icon: FiArrowDown,
-      iconColorClass: "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-400"
-    };
-
-    setTransactionsList((prev) => [newTx, ...prev]);
-    setIsAddMoneyOpen(false);
-    setAddAmount("");
   };
 
   return (
@@ -186,9 +201,20 @@ export default function DashboardPage() {
         <Card className="relative overflow-hidden bg-gradient-to-br from-white via-white to-emerald-50/20 dark:from-slate-900 dark:via-slate-900 dark:to-emerald-950/10 border-gray-150 dark:border-slate-800">
           <div className="flex justify-between items-start relative z-10">
             <div className="space-y-2.5">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
-                Total Balance
-              </span>
+              <div className="flex items-center space-x-1.5">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                  Total Balance
+                </span>
+                <button
+                  type="button"
+                  onClick={handleRefresh}
+                  className={`p-0.5 text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all cursor-pointer rounded hover:bg-gray-100 dark:hover:bg-slate-800 ${isRefreshing ? "animate-spin" : ""
+                    }`}
+                  title="Refresh Balance"
+                >
+                  <FiRefreshCw className="h-2.5 w-2.5" />
+                </button>
+              </div>
               <h3 className="text-4xl md:text-5xl font-black tracking-tight text-gray-900 dark:text-white">
                 ₹{balance.toLocaleString("en-IN")}
               </h3>
@@ -201,7 +227,7 @@ export default function DashboardPage() {
                 Add Money
               </button>
             </div>
-            <div className="bg-gray-50 border border-gray-100 dark:bg-slate-800 dark:border-slate-700 p-3 rounded-xl shadow-sm">
+            <div className="bg-gray-50 border border-gray-105 dark:bg-slate-850 dark:border-slate-700 p-3 rounded-xl shadow-sm">
               <FiCreditCard className="h-6 w-6 text-gray-700 dark:text-gray-300" />
             </div>
           </div>
