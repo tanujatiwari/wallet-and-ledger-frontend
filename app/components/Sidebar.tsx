@@ -29,12 +29,12 @@ export const Sidebar: React.FC = () => {
   const handleLogout = async () => {
     removeCookie("accessToken");
     removeCookie("refreshToken");
+    router.push("/login");
     showToast({
       type: "success",
       title: "Sorry to see you go",
       subtitle: "You've been logged out"
     });
-    router.push("/login");
     // await logout()
   };
 

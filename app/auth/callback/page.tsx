@@ -4,6 +4,7 @@ import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { setCookie } from "@/app/utils/cookies";
 import { showToast } from "@/app/components/ToastMessage";
+import { getUserProfile } from "@/app/apis";
 
 function CallbackContent() {
   const router = useRouter();
@@ -17,12 +18,33 @@ function CallbackContent() {
     if (accessToken && refreshToken) {
       setCookie("accessToken", accessToken);
       setCookie("refreshToken", refreshToken);
-      showToast({
-        type: "success",
-        title: "Login Successful",
-        subtitle: "Welcome to Ledger Pro!",
-      });
-      router.push("/dashboard");
+
+      const fetchProfileAndRedirect = async () => {
+        try {
+          const profile = await getUserProfile();
+          showToast({
+            type: "success",
+            title: "Login Successful",
+            subtitle: `Welcome to Ledger Pro, ${profile?.displayName || "User"}!`,
+          });
+
+          if (profile?.wallets && profile.wallets.length > 0) {
+            router.push("/dashboard");
+          } else {
+            router.push("/setup");
+          }
+        } catch (err) {
+          console.error("Error fetching user profile:", err);
+          showToast({
+            type: "error",
+            title: "Login Error",
+            subtitle: "Failed to retrieve your profile. Please try again.",
+          });
+          router.push("/login");
+        }
+      };
+
+      fetchProfileAndRedirect();
     } else if (error) {
       showToast({
         type: "error",

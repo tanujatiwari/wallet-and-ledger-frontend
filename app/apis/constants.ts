@@ -10,4 +10,5 @@ export const apis = {
     getWalletHistory: (walletId: string) => `/api/wallet/${walletId}/history`,
     schedulePayment: "/api/wallet/schedule",
     cancelScheduledPayment: (scheduleId: string) => `/api/wallet/schedule/${scheduleId}/cancel`,
+    userProfile: 'api/me'
 }

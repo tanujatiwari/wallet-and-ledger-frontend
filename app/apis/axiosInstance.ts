@@ -7,9 +7,9 @@ const axiosInstance = () => {
     })
 
     instance.interceptors.request.use((config) => {
-        const token = getCookie("token")
-        if (token && token.accessToken) {
-            config.headers.Authorization = `Bearer ${token.accessToken}`
+        const token = getCookie("accessToken")
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`
         }
         return config
     })
