@@ -1,6 +1,7 @@
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useState } from "react";
 import { apis } from "../apis/constants";
+import { showToast } from "../components/ToastMessage";
 
 export function useLogin() {
     const router = useRouter()
@@ -46,6 +47,11 @@ export function useLogin() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        showToast({
+            type: 'success',
+            title: 'Welcome',
+            subtitle: 'Successfully signed in to Ledger Pro.'
+        });
         router.push("/dashboard");
     };
 

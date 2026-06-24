@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 import {
   FiCalendar,
@@ -12,6 +12,7 @@ import {
 } from "react-icons/fi";
 import { RiBankLine } from "react-icons/ri";
 import { removeCookie } from "../utils/cookies";
+import { showToast } from "./ToastMessage";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: FiGrid },
@@ -23,11 +24,17 @@ const navItems = [
 
 export const Sidebar: React.FC = () => {
   const pathname = usePathname();
+  const router = useRouter();
 
   const handleLogout = async () => {
     removeCookie("accessToken");
     removeCookie("refreshToken");
-    window.location.href = "/login";
+    showToast({
+      type: "success",
+      title: "Sorry to see you go",
+      subtitle: "You've been logged out"
+    });
+    router.push("/login");
     // await logout()
   };
 
