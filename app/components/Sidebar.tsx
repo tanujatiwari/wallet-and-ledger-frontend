@@ -4,14 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 import {
-  FiCreditCard,
+  FiCalendar,
   FiGrid,
   FiList,
   FiLogOut,
-  FiSend,
-  FiCalendar
+  FiSend
 } from "react-icons/fi";
 import { RiBankLine } from "react-icons/ri";
+import { removeCookie } from "../utils/cookies";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: FiGrid },
@@ -20,12 +20,20 @@ const navItems = [
   { href: "/dashboard/transactions", label: "Transactions", icon: FiList },
 ];
 
-const bottomItems = [
-  { href: "/login", label: "Logout", icon: FiLogOut },
-];
 
 export const Sidebar: React.FC = () => {
   const pathname = usePathname();
+
+  const handleLogout = async () => {
+    removeCookie("accessToken");
+    removeCookie("refreshToken");
+    window.location.href = "/login";
+    // await logout()
+  };
+
+  const bottomItems = [
+    { label: "Logout", icon: FiLogOut, action: handleLogout },
+  ];
 
   return (
     <aside className="w-64 h-screen border-r border-gray-150 bg-[#f8fafc] dark:bg-slate-900 dark:border-slate-800 flex flex-col justify-between p-5 transition-all">
@@ -67,22 +75,17 @@ export const Sidebar: React.FC = () => {
       </div>
 
       <div className="flex flex-col gap-1 border-t border-gray-200 dark:border-slate-800 pt-4">
-        {bottomItems.map((item) => {
+        {bottomItems.map((item, index) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href;
-
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-150 ${isActive
-                ? "bg-[#4df0b0] text-gray-900"
-                : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-slate-800 dark:hover:text-white"
-                }`}
+            <button
+              key={index}
+              className={`cursor-pointer flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-150 text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-slate-800 dark:hover:text-white`}
+              onClick={item.action}
             >
               <Icon className="h-4.5 w-4.5 text-gray-500 dark:text-gray-450" />
               <span>{item.label}</span>
-            </Link>
+            </button>
           );
         })}
       </div>

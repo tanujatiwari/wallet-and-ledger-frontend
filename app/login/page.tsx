@@ -1,27 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Card } from "../components/Card";
-import { Input } from "../components/Input";
+import { FiLock, FiMail } from "react-icons/fi";
 import { Button } from "../components/Button";
-import Navbar from "../components/navbar";
+import { Card } from "../components/Card";
 import Footer from "../components/footer";
-import { FiMail, FiLock } from "react-icons/fi";
-import Link from "next/link";
+import { Input } from "../components/Input";
+import Navbar from "../components/navbar";
 import { GoogleIcon } from "../utils/svgs";
+import { useLogin } from "./useLogin";
 
 export default function LoginPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Redirect to dashboard page
-    router.push("/dashboard");
-  };
+  const { form, handleSubmit, handleFormChange, handleContinueWithGoogle } = useLogin()
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
@@ -42,7 +31,7 @@ export default function LoginPage() {
             type="button"
             variant="outline"
             className="w-full py-3 flex items-center justify-center font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-slate-700 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 shadow-sm transition-all"
-            onClick={() => router.push("/dashboard")}
+            onClick={handleContinueWithGoogle}
           >
             <GoogleIcon />
             Continue with Google
@@ -64,26 +53,29 @@ export default function LoginPage() {
               required
               placeholder="name@company.com"
               icon={<FiMail className="h-4.5 w-4.5" />}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={form.email}
+              name="email"
+              onChange={handleFormChange}
             />
 
             <Input
               label="Password"
               type="password"
+              name="password"
               required
               placeholder="••••••••"
               icon={<FiLock className="h-4.5 w-4.5" />}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={form.password}
+              onChange={handleFormChange}
             />
 
             <div className="flex items-center space-x-2 pt-1">
               <input
                 id="remember"
                 type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
+                name="rememberMe"
+                checked={form.rememberMe}
+                onChange={handleFormChange}
                 className="h-4 w-4 rounded border-gray-300 text-black focus:ring-accent-mint/50 dark:border-slate-700 dark:bg-slate-800"
               />
               <label
